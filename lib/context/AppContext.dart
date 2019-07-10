@@ -7,7 +7,7 @@ import '../models/Sale.dart';
 
 class AppContext extends Model {
   bool _isLoading = true;
-  final String _serverIP = 'https://icvm-server.herokuapp.com/';//https://icvm-server.herokuapp.com/
+  final String _serverIP = 'https://192.168.0./';//https://icvm-server.herokuapp.com/
   List<Beer> _beers = List();
   List<Sale> _sales = List();
 
@@ -80,7 +80,7 @@ class AppContext extends Model {
     beer.quantity += int.parse(quantity);
     print(beer.quantity);
     Map<String, String> headers = {"Content-type": "application/json"};
-    String json = '{"id": "' + beer.id.toString() + '","quantity": "' + beer.quantity.toString() + '"}';
+    String json = '{"id": "' + beer.id.toString() + '","quantity": "' + beer.quantity.toString() + '", "date": "' + DateTime.now().toString() + '"}';
     var response = await http.put(Uri.parse(_serverIP + 'beers'), headers: headers, body: json);
     if(response.statusCode == 200) {
       _showNotification(context, 'Agregado correctamente');
