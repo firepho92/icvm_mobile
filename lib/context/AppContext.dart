@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -6,14 +8,14 @@ import '../models/Beer.dart';
 import '../models/Sale.dart';
 
 class AppContext extends Model {
-  bool _isLoading = true;
-  final String _serverIP = 'https://192.168.0./';//https://icvm-server.herokuapp.com/
+  int _isLoading = 0;
+  final String _serverIP = 'http://192.168.100.4:8000/';//https://icvm-server.herokuapp.com/
   List<Beer> _beers = List();
   List<Sale> _sales = List();
 
   List<Beer> get beers => _beers;
   List<Sale> get sales => _sales;
-  bool get isLoading => _isLoading;
+  int get isLoading => _isLoading;
 
   AppContext() {
     init();
@@ -22,7 +24,8 @@ class AppContext extends Model {
   init() async {
     final bool beers = await _fecthBeers();
     final bool sales = await _fetchSales();
-    if(beers && sales){
+    if(beers && sales) {
+      _isLoading = 1;
       notifyListeners();
     } else {
       //_showNotification(context, 'No se puede conectar con el servidor');
@@ -30,36 +33,44 @@ class AppContext extends Model {
   }
 
   _fecthBeers() async {
-    _isLoading = true;
-    final response = await http.get(Uri.parse(_serverIP + 'beers'));
-    if(response.statusCode == 200) {
-      _beers = (json.decode(response.body) as List)
-        .map((data) => new Beer.fromJson(data))
-        .toList();
-        _isLoading = false;
-    } else {
-      throw Exception('Failed to fecth data from server');
-    }
-    if(response.statusCode == 200)
-      return true;
-    else
+    try {
+      final response = await http.get(Uri.parse(_serverIP + 'beers'));
+      if(response.statusCode == 200) {
+        _beers = (json.decode(response.body) as List)
+          .map((data) => new Beer.fromJson(data))
+          .toList();
+      } else {
+        throw Exception('Failed to fecth data from server');
+      }
+      if(response.statusCode == 200)
+        return true;
+      else
+        return false;
+    } on SocketException catch(e) {
+      print(e.toString());
       return false;
+    }
   }
 
   _fetchSales() async {
-    final response = await http.get(Uri.parse(_serverIP + 'sales'));
-    if(response.statusCode == 200) {
-      _sales = (json.decode(response.body) as List)
-        .map((data) => new Sale.fromJson(data))
-        .toList();
-        _isLoading = false;
-    } else {
-      throw Exception('Failed to fecth data from server');
-    }
-    if(response.statusCode == 200)
-      return true;
-    else
+    try{
+      final response = await http.get(Uri.parse(_serverIP + 'sales'));
+      if(response.statusCode == 200) {
+        _sales = (json.decode(response.body) as List)
+          .map((data) => new Sale.fromJson(data))
+          .toList();
+      } else {
+        throw Exception('Failed to fecth data from server');
+      }
+      if(response.statusCode == 200)
+        return true;
+      else
+        return false;
+    } on SocketException catch(e) {
+      print(e.toString());
       return false;
+    }
+    
   }
 
   addBeerCount(index) async {
@@ -113,10 +124,10 @@ class AppContext extends Model {
     String json = '';
     for(int i = 0; i < _beers.length; i++) {
       if(i == _beers.length -1) {
-        sales += '{"beer": "' + _beers[i].id.toString() + '", "quantity": "' + _beers[i].quantity.toString() + ' "}';
+        sales += '{"beer": "' + _beers[i].id.toString() + '", "quantity": "' + _beers[i].quantity.toString() + '", "date": "' + DateTime.now().toString() + '", "amount": "' + _beers[i].amount.toString() + '"}';
         break;
       }
-      sales += '{"beer": "' + _beers[i].id.toString() + '", "quantity": "' + _beers[i].quantity.toString() + '"}, ';
+      sales += '{"beer": "' + _beers[i].id.toString() + '", "quantity": "' + _beers[i].quantity.toString() + '", "date": "' + DateTime.now().toString() + '" , "amount": "' + _beers[i].amount.toString() + '"}, ';
     }
     json = '{"sales":[' + sales + ']}';
     final response = await http.post(Uri.parse(_serverIP + 'sales'), headers: headers, body: json);

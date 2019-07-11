@@ -4,6 +4,8 @@ import '../models/Sale.dart';
 import 'package:flutter/services.dart';
 import 'package:icvm_mobile/context/AppContext.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:gradient_app_bar/gradient_app_bar.dart';
+
 
 class BeerPage extends StatefulWidget {
   BeerPage({Key key, this.beer, this.sales}) : super(key: key);
@@ -31,36 +33,27 @@ class _BeerPageState extends State<BeerPage> {
   String quantity = '0';
   @override
 
-  /*void sendData(BuildContext context) async {
-    //var now = DateTime.parse(sales[0].date); si es compatible con la fecha de JS
-    int updatedQuantity = beer.quantity + int.parse(quantity);
-    Map<String, String> headers = {"Content-type": "application/json"};
-    String json = '{"id": "' + beer.id.toString() + '","quantity": "' + updatedQuantity.toString() + '"}';
-    var response = await http.put(Uri.parse(_serverIP), headers: headers, body: json);
-    if(response.statusCode == 200) {
-      //_showNotification(context, 'Agregado correctamente');
-      print(response.body);
-    } else {
-      print(response.body);
-      //_showNotification(context, 'No se puede conectar con el servidor');
-    }
-  }*/
-
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(beer.name),
-      ),
+      appBar: GradientAppBar(
+          title: Text(beer.name),
+          centerTitle: true,
+          elevation: 0.0,
+          backgroundColorStart: Colors.indigo,
+          backgroundColorEnd: Colors.indigo,
+          ),
       body: buildBeerPageData(quantity, beer)
     );
   }
 }
 
 var buildBeerPageData = (String quantity, Beer beer) => ScopedModelDescendant<AppContext>(
-  builder: (context, child, model) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+  builder: (context, child, model) => SizedBox(
+      height: 600,
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
+          statisticsCards(),
           Center(
             child: Card(
               child: Padding(
@@ -69,7 +62,7 @@ var buildBeerPageData = (String quantity, Beer beer) => ScopedModelDescendant<Ap
                   children: <Widget>[
                     Text('Agregar a inventario'),
                     Container(
-                      width: 200.0,
+                      width: 230.0,
                       child: TextField(
                         onChanged: (text) {quantity = text;},
                         keyboardType: TextInputType.number,
@@ -92,5 +85,70 @@ var buildBeerPageData = (String quantity, Beer beer) => ScopedModelDescendant<Ap
             ),
           )
         ],
-      )
+      ),
+    )
+        
 );
+
+var statisticsCards = () => ScopedModelDescendant<AppContext>(
+  builder: (context, child, model) => SizedBox(
+    height: 200,
+    child: PageView(
+      controller: PageController(viewportFraction: 0.8),
+      physics: BouncingScrollPhysics(),
+      children: <Widget>[
+        Container(
+          height: 150,
+          child: Padding(
+            padding: EdgeInsets.all(5),
+            child: Card(
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('Ventas de hoy: 10')
+                  ],
+                )
+              ),
+            )
+          )
+        ),
+        Container(
+          height: 150,
+          child: Padding(
+            padding: EdgeInsets.all(5),
+            child: Card(
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('Ventas de la semana: 10')
+                  ],
+                )
+              ),
+            )
+          )
+        ),
+        Container(
+          height: 150,
+          child: Padding(
+            padding: EdgeInsets.all(5),
+            child: Card(
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('Ventas del mes: 10')
+                  ],
+                )
+              ),
+            )
+          )
+        ),
+    ])
+  )
+);
+

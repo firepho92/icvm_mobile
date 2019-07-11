@@ -47,11 +47,7 @@ List<Sale> sales(List<Sale> sales, int beer) => sales.where((sale) => sale.beer 
 var beerData = (Beer beer) => beer.name + ': ' + beer.quantity.toString();
 
 var buildThirdPage = () => ScopedModelDescendant<AppContext>(
-  builder: (context, child, model) => model.isLoading
-                                      ? Center(
-                                        child: CircularProgressIndicator(),
-                                        )
-                                        : buildBeerData()
+  builder: (context, child, model) => buildBeerData()
 );
 
 var buildBeerData = () => ScopedModelDescendant<AppContext>(

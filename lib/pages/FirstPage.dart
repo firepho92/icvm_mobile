@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:icvm_mobile/context/AppContext.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -27,13 +26,10 @@ class _FirstPageState extends State<FirstPage> with RouteAware {
   _FirstPageState({this.title});
   List<Beer> list = List();
   final String title;
-  var serverResposeStatus = 0;
-  var isLoading = false;
-  final serverIP = 'https://icvm-server.herokuapp.com/beers';
 
-  _sustractBeerCount(index) {
+  /*_sustractBeerCount(index) {
     list[index].quantity -= 1;
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -54,11 +50,7 @@ class _FirstPageState extends State<FirstPage> with RouteAware {
 var beerData = (Beer beer) => beer.name + ': ' + beer.amount.toString();
 
 var buildFirstPage = () => ScopedModelDescendant<AppContext>(
-  builder: (context, child, model) => model.isLoading
-                                      ? Center(
-                                        child: CircularProgressIndicator(),
-                                        )
-                                        : buildBeerData()
+  builder: (context, child, model) => buildBeerData()
 );
 
 var buildBeerData = () => ScopedModelDescendant<AppContext>(

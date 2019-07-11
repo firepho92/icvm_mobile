@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:icvm_mobile/context/AppContext.dart';
+import 'package:scoped_model/scoped_model.dart';
 import './FirstPage.dart';
 import './ThirdPage.dart';
 
@@ -49,7 +51,6 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (currentIndex) {
@@ -69,10 +70,39 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
           )
         ]
         ),
-      body: TabBarView(
-        controller: _tabController,
-        children: _tabList
-        ),
+      body: buildUI(_tabController, _tabList)
     );
   }
+}
+
+var buildUI = (TabController _tabController, List<Widget> _tabList) => ScopedModelDescendant<AppContext>(
+  builder: (context, child, model) => ui(model.isLoading, _tabController, _tabList)
+);
+
+Widget ui(int loadState, TabController _tabController, List<Widget> _tabList) {
+  if(loadState == 0) {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  } else {
+    if(loadState == 1) {
+      return TabBarView(
+        controller: _tabController,
+        children: _tabList
+      );
+    } if(loadState == 2) {
+      return Center(
+        child: RaisedButton(
+          child: Text('recargar'),
+          onPressed: () {},
+        )
+      );
+    }
+  }
+  return Center(
+    child: RaisedButton(
+      child: Text('recargar'),
+      onPressed: () {},
+    )
+  );
 }
